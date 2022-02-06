@@ -1,0 +1,90 @@
+#!/bin/bash
+
+##########################
+# generate random passwd #
+# and print to stdout    #
+##########################
+
+
+
+
+# common script declarations
+ProgName="$0"
+Version="1.001"
+CreationDate="2022-01-28"
+VersionDate="2022-01-28"
+Author="BasheD"
+Description="Generate random password"
+Pid="$$"
+
+
+
+
+# Declarations ->
+
+  RAND_NUMBER=""
+  NEW_LETTER=""
+  OUTPUT_PASSWD=""
+  # change this to adjust the final password length
+  PASSWD_LENGTH="25"
+
+# Declarations -|
+
+
+
+# Main () ->
+
+    # repeat until password variable contains 8 characters
+    for (( x=1; x<="$PASSWD_LENGTH"; x++ ))
+      do
+        # generate random numbers and store result in RAND_NUMBER
+        RAND_NUMBER=$(shuf --input-range=1-36 --head-count=1)
+
+        # convert RAND_NUMBER to letter and store letter
+        case "$RAND_NUMBER" in
+          1 )  NEW_LETTER="a";;
+          2 )  NEW_LETTER="b";;
+          3 )  NEW_LETTER="c";;
+          4 )  NEW_LETTER="d";;
+          5 )  NEW_LETTER="e";;
+          6 )  NEW_LETTER="f";;
+          7 )  NEW_LETTER="g";;
+          8 )  NEW_LETTER="h";;
+          9 )  NEW_LETTER="i";;
+          10)  NEW_LETTER="j";;
+          11)  NEW_LETTER="k";;
+          12)  NEW_LETTER="l";;
+          13)  NEW_LETTER="m";;
+          14)  NEW_LETTER="n";;
+          15)  NEW_LETTER="o";;
+          16)  NEW_LETTER="p";;
+          17)  NEW_LETTER="q";;
+          18)  NEW_LETTER="r";;
+          19)  NEW_LETTER="s";;
+          20)  NEW_LETTER="t";;
+          21)  NEW_LETTER="u";;
+          22)  NEW_LETTER="v";;
+          23)  NEW_LETTER="w";;
+          24)  NEW_LETTER="x";;
+          25)  NEW_LETTER="y";;
+          26)  NEW_LETTER="z";;
+          27)  NEW_LETTER="0";;
+          28)  NEW_LETTER="1";;
+          29)  NEW_LETTER="2";;
+          30)  NEW_LETTER="3";;
+          31)  NEW_LETTER="4";;
+          32)  NEW_LETTER="5";;
+          33)  NEW_LETTER="6";;
+          34)  NEW_LETTER="7";;
+          35)  NEW_LETTER="8";;
+          36)  NEW_LETTER="9";;
+        esac
+
+        # add stored letter to output password variable
+        OUTPUT_PASSWD="${OUTPUT_PASSWD}$NEW_LETTER"
+    done
+
+    # print password variable
+    echo "$OUTPUT_PASSWD"
+
+# Main () -|
