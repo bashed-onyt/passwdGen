@@ -87,7 +87,7 @@ getNumber()
               then
                 PASSWD_LENGTH="$OPTARG"
               else
-                echo "    ** Invalid value for password length [ -$OPTARG ] **" >&2
+                echo "    ** Invalid value for password length [ $OPTARG ] **" >&2
                 scriptUsage 1
             fi
         ;;
