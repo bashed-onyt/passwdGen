@@ -42,9 +42,9 @@ Pid="$$"
 scriptUsage()
 {
     echo
-    echo "  $ProgName <-p password_length>"
+    echo "  $ProgName <-l password_length>"
     echo
-    echo "    -p <password_length>    Must be an integer between 8 & 24"
+    echo "    -l <password_length>    Must be an integer between 8 & 24"
     echo "    -h                      Print this help message"
     echo
 
