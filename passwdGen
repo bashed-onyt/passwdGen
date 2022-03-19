@@ -9,10 +9,10 @@
 
 
 # common script declarations
-ProgName="$0"
+ProgName="${0##*/}"
 Version="1.002"
-CreationDate="2022-01-28"
-VersionDate="2022-02-09"
+CreationDate="2022-02-25"
+VersionDate="2022-03-19"
 Author="BasheD"
 Description="Generate random password"
 Pid="$$"
@@ -95,11 +95,11 @@ getNumber()
         h)  scriptUsage
         ;;
 
-       \?)  echo "    ** Invalid option [ -$OPTARG ] **" >&2
+       \?)  echo "    ** Invalid option [ $OPTARG ] **" >&2
             scriptUsage 1
         ;;
 
-        :)  echo "    ** Missing argument for -$OPTARG **" >&2
+        :)  echo "    ** Missing argument for $OPTARG **" >&2
             scriptUsage 1
         ;;
       esac
@@ -137,13 +137,13 @@ getNumber()
 
 # Main () ->
 
-    # repeat until password variable contains 8 characters
+    # repeat until OUTPUT_PASSWD contains PASSWD_LENGTH characters
     for (( x=1; x<="$PASSWD_LENGTH"; x++ ))
       do
         # generate random numbers and store result in RAND_NUMBER
         RAND_NUMBER=$(getNumber)
 
-        # convert RAND_NUMBER to letter and store letter
+        # convert RAND_NUMBER to letter and store letter in NEW_LETTER
         case "$RAND_NUMBER" in
           1 )  NEW_LETTER="a";;
           2 )  NEW_LETTER="b";;
@@ -187,7 +187,7 @@ getNumber()
         # shuf generates one number between 1 & 36 which is divided (modulus) by 2
         # if the remainder is 0 then the number is even, so make the currently selecting NEW_LETTER upper case
         # has no effect on NEW_LETTER if NEW_LETTER is numeric
-        if (( $(( RAND_NUMBER % 2 )) == 0 ))
+        if (( $(( $(getNumber) % 2 )) == 0 ))
           then
             # add stored letter to output password variable
             OUTPUT_PASSWD="${OUTPUT_PASSWD}${NEW_LETTER^}"
@@ -197,7 +197,7 @@ getNumber()
         fi
     done
 
-    # print password variable
+    # print final OUTPUT_PASSWD
     echo "$OUTPUT_PASSWD"
 
 # Main () -|
