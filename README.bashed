@@ -65,6 +65,16 @@
 #@@ VERSION #2 CONCEPTS
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
+# Copy files
+#############
+# COMMAND :: cp
+# SYNTAX  :: cp <source_file> <destination_file>
+# EXAMPLE :: cp passwdGen passwdGen_v1
+# NOTES   :: The cp command has many other options (see man cp)
+
+
+
+
 # Positional parameters
 ########################
 # NAME    :: script and function positional parameters
@@ -97,7 +107,7 @@
 # Parameter expansion substitution
 ###################################
 # NAME    :: Bash parameter expansion replacement/substitution
-# EXAMPLE :: ${VAR:+SET}, ${VAR:-NOT_SET}
-# NOTES   :: ':+' => If VAR is set, replace it with "SET" otherwise empty, ':-' If VAR is not set, replace it with "NOT_SET" otherwise use set value
-
+# EXAMPLE :: ${VAR:+SET} OR ${VAR:-NOT_SET} OR ${0##*/}
+# NOTES   :: ':+' => If VAR is set, replace it with "SET" otherwise empty, ':-' if VAR is not set, replace it with "NOT_SET" otherwise use set value
+#         :: '##*/' deletes file path from variable up to and including the last '/'
 
