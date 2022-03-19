@@ -189,10 +189,10 @@ getNumber()
         # has no effect on NEW_LETTER if NEW_LETTER is numeric
         if (( $(( $(getNumber) % 2 )) == 0 ))
           then
-            # add stored letter to output password variable
+            # add upper case NEW_LETTER to OUTPUT_PASSWD
             OUTPUT_PASSWD="${OUTPUT_PASSWD}${NEW_LETTER^}"
           else
-            # add stored letter to output password variable
+            # add NEW_LETTER to OUTPUT_PASSWD
             OUTPUT_PASSWD="${OUTPUT_PASSWD}$NEW_LETTER"
         fi
     done
