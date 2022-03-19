@@ -11,8 +11,8 @@
 # common script declarations
 ProgName="$0"
 Version="1.001"
-CreationDate="2022-01-28"
-VersionDate="2022-01-28"
+CreationDate="2022-02-25"
+VersionDate="2022-02-25"
 Author="BasheD"
 Description="Generate random password"
 Pid="$$"
