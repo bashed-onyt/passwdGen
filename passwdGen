@@ -42,7 +42,7 @@ Pid="$$"
 scriptUsage()
 {
     echo
-    echo "  $ProgName <-l password_length>"
+    echo "  Usage: $ProgName <-l password_length>"
     echo
     echo "    -l <password_length>    Must be an integer between 8 & 24"
     echo "    -h                      Print this help message"
@@ -185,7 +185,7 @@ getNumber()
 
         # add random upper case letters
         # shuf generates one number between 1 & 36 which is divided (modulus) by 2
-        # if the remainder is 0 then the number is even, so make the currently selecting NEW_LETTER upper case
+        # if the remainder is 0 then the number is even, so make the currently selected NEW_LETTER upper case
         # has no effect on NEW_LETTER if NEW_LETTER is numeric
         if (( $(( $(getNumber) % 2 )) == 0 ))
           then
