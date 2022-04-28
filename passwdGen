@@ -1,0 +1,269 @@
+#!/bin/bash
+
+##########################
+# generate random passwd #
+# and print to stdout    #
+##########################
+
+
+
+
+# common script declarations
+ProgName="${0##*/}"
+Version="1.003"
+CreationDate="2022-02-25"
+VersionDate="2022-04-24"
+Author="BasheD"
+Description="Generate a random password"
+Pid="$$"
+DefLength=16
+MinLength=8
+MaxLength=32
+AlphaChars=( "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z" )
+NumericChars=( "0" "1" "2" "3" "4" "5" "6" "7" "8" "9" )
+AlnumChars=( "${AlphaChars[@]}" "${NumericChars[@]}" )
+ComplexChars=( "${AlnumChars[@]}" "!" "@" "#" "$" "%" "^" "&" "*" "-" "_" )
+
+
+
+
+# Functions ->
+
+# Usage: scriptUsage(exit_code)
+#
+#  @@Input:
+#    exit_code (optional)
+#    = integer
+#
+#  @@Output:
+#    print <stdout>
+#    = message string
+#
+#  @@Returns:
+#    none
+#
+#  @@Notes:
+#    always exits
+#
+#
+scriptUsage()
+{
+    echo
+    echo "  Usage: $ProgName [-l <password_length>] [-a|-n|-m|-c] [-L|-U|-M] [-h]"
+    echo
+    echo "    $Description"
+    echo
+    echo "    Options:"
+    echo "    --------"
+    echo "    [Password Length]:"
+    echo "    -l <password_length>      Must be an integer between $MinLength & $MaxLength (default: $DefLength)"
+    echo
+    echo "    [Character Set]:"
+    echo "    -a                        Create an alphabetic only password"
+    echo "    -n                        Create a numeric only password"
+    echo "    -m                        Create an alphanumeric password"
+    echo "    -c                        Create a complex password (default)"
+    echo
+    echo "    [Case Sensitivity]:"
+    echo "    -L                        Create a password where all leters are lower case"
+    echo "    -U                        Create a password where all leters are upper case"
+    echo "    -M                        Create a password where all leters are mixed case (default)"
+    echo
+    echo "    [Help]:"
+    echo "    -h                        Prints this help message"
+    echo
+    echo "  Written by: $Author"
+    echo "  Created on: $CreationDate"
+    echo
+
+    exit "${1:-0}"
+}
+
+
+# Usage: getNumber()
+#
+#  @@Input:
+#    none
+#
+#  @@Output:
+#    print <stdout>
+#    = integer
+#
+#  @@Returns:
+#    none
+#
+#  @@Notes:
+#    none
+#
+#
+getNumber()
+{
+    shuf --input-range=0-$CHAR_RANGE --head-count=1
+}
+
+# Functions -|
+
+
+
+
+# CLI Arguments ->
+
+  while getopts ":l:anmcLUMh" opt
+    do
+      case "$opt" in
+        l)  if (( $OPTARG >= $MinLength )) && (( $OPTARG <= $MaxLength ))
+              then
+                PASSWD_LENGTH="$OPTARG"
+              else
+                echo "    ** Invalid value for password length [ $OPTARG ] **" >&2
+                scriptUsage 1
+            fi
+        ;;
+
+        ## CHARACTER SET ##
+        a)  if [[ -z "${CharSet[@]}" ]]
+              then
+                CharSet=( "${AlphaChars[@]}" )
+              else
+                echo "    ** Cannot use more than one character set **" >&2
+                scriptUsage 1
+            fi
+        ;;
+
+        n)  if [[ -z "${CharSet[@]}" ]]
+              then
+                CharSet=( "${NumericChars[@]}" )
+              else
+                echo "    ** Cannot use more than one character set **" >&2
+                scriptUsage 1
+            fi
+        ;;
+
+        m)  if [[ -z "${CharSet[@]}" ]]
+              then
+                CharSet=( "${AlnumChars[@]}" )
+              else
+                echo "    ** Cannot use more than one character set **" >&2
+                scriptUsage 1
+            fi
+        ;;
+
+        c)  if [[ -z "${CharSet[@]}" ]]
+              then
+                CharSet=( "${ComplexChars[@]}" )
+              else
+                echo "    ** Cannot use more than one character set **" >&2
+                scriptUsage 1
+            fi
+        ;;
+
+        ## CASE SENSITIVITY ##
+        L)  if [[ -z "$SET_CASE" ]]
+              then
+                SET_CASE="lower"
+              else
+                echo "    ** Cannot use more than one case sensitivity **" >&2
+                scriptUsage 1
+            fi
+        ;;
+
+        U)  if [[ -z "$SET_CASE" ]]
+              then
+                SET_CASE="upper"
+              else
+                echo "    ** Cannot use more than one case sensitivity **" >&2
+                scriptUsage 1
+            fi
+        ;;
+
+        M)  if [[ -z "$SET_CASE" ]]
+              then
+                SET_CASE="mixed"
+              else
+                echo "    ** Cannot use more than one case sensitivity **" >&2
+                scriptUsage 1
+            fi
+        ;;
+
+        h)  scriptUsage
+        ;;
+
+       \?)  echo "    ** Invalid option [ $OPTARG ] **" >&2
+            scriptUsage 1
+        ;;
+
+        :)  echo "    ** Missing a required argument for $OPTARG **" >&2
+            scriptUsage 1
+        ;;
+      esac
+  done
+
+  # not required in this usage but a good practice to include anyways
+  shift $((OPTIND-1))
+
+  unset opt
+
+# CLI Arguments -|
+
+
+
+
+# Declarations ->
+
+  # set these to defaults if not already set
+  PASSWD_LENGTH="${PASSWD_LENGTH:-$DefLength}"
+  CharSet=( "${CharSet[@]:-${ComplexChars[@]}}" )
+  SET_CASE="${SET_CASE:-mixed}"
+
+  # since the array is zero biased the length needs to be - 1
+  CHAR_RANGE="$(( ${#CharSet[@]} - 1 ))"
+  RAND_NUMBER=""
+  OUTPUT_PASSWD=""
+  NEW_LETTER=""
+
+  x=0
+
+# Declarations -|
+
+
+
+
+# Main() ->
+
+    # repeat until OUTPUT_PASSWD contains PASSWD_LENGTH characters
+    for (( x=0; x<"$PASSWD_LENGTH"; x++ ))
+      do
+        # generate a random number and store result in RAND_NUMBER
+        RAND_NUMBER=$(getNumber)
+
+        # convert RAND_NUMBER to letter and store letter in NEW_LETTER
+        NEW_LETTER="${CharSet[${RAND_NUMBER}]}"
+
+        # add random upper case letters
+        # shuf generates one number between 1 & 36 which is divided (modulus) by 2
+        # if the remainder is 0 then the number is even, so make the currently selected NEW_LETTER upper case
+        # has no effect on NEW_LETTER if NEW_LETTER is numeric
+        if (( $(( $(getNumber) % 2 )) == 0 ))
+          then
+            # add upper case NEW_LETTER to OUTPUT_PASSWD
+            OUTPUT_PASSWD="${OUTPUT_PASSWD}${NEW_LETTER^}"
+          else
+            # add NEW_LETTER to OUTPUT_PASSWD
+            OUTPUT_PASSWD="${OUTPUT_PASSWD}$NEW_LETTER"
+        fi
+    done
+
+    # handle case semsitivity if required (do nothing on mixed)
+    case "$SET_CASE" in
+      "lower")  OUTPUT_PASSWD="${OUTPUT_PASSWD,,}"
+            ;;
+
+      "upper")  OUTPUT_PASSWD="${OUTPUT_PASSWD^^}"
+            ;;
+    esac
+
+    # print final OUTPUT_PASSWD
+    echo "$OUTPUT_PASSWD"
+
+# Main() -|
+
