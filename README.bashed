@@ -1,0 +1,222 @@
+# Reference README for BasheD scripts
+######################################
+
+
+
+
+#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#@@ VERSION #1 CONCEPTS
+#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+# File descriptors
+###################
+# NAME    :: stdout
+# EXAMPLE :: command_to_write_to_file 1> file OR command_to_write_to_file > file
+# NOTES   :: Default file descriptor to which a command can write output (commonly used '>')
+
+
+# NAME    :: stdin
+# EXAMPLE :: command_to_read_from_file <0 file OR command_to_read_from_file < file
+# NOTES   :: Default file descriptor from which a command can read input (commonly used '<')
+
+
+# NAME    :: stderr
+# EXAMPLE :: command_writing_error_message 2> file
+# NOTES   :: Default file descriptor to which a command can write error messages
+
+
+
+
+# Lookup command manuals from cli
+##################################
+# COMMAND :: man
+# SYNTAX  :: man <command>
+# EXAMPLE :: man foo
+# NOTES   :: Lookup manual for a command in the cli
+
+
+
+# Print output
+###############
+# COMMAND :: echo
+# SYNTAX  :: echo <text_to_print>
+# EXAMPLE :: echo "Foo"
+# NOTES   :: Echo text to terminal with new line
+
+
+# COMMAND :: printf
+# SYNTAX  :: printf <output_format> <text_to_print>
+# EXAMPLE :: printf '%s\n' "Foo"
+# NOTES   :: Print text to terminal with manual formatting
+
+
+
+
+# Print random permutations to standard output (stdout)
+########################################################
+# COMMAND :: shuf
+# SYNTAX  :: shuf [OPTIONS]
+# EXAMPLE :: shuf --input-range=<LO>-<HI> --head-count=<integer>
+# NOTES   :: The above syntax prints <head_count> random numbers between <LO> and <HI>
+
+
+
+
+#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#@@ VERSION #2 CONCEPTS
+#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+# Copy files 
+#############
+# COMMAND :: cp 
+# SYNTAX  :: cp <source_file> <destination_file>
+# EXAMPLE :: cp passwdGen passwdGen_v1
+# NOTES   :: The cp command has many other options (see man cp)
+
+
+# Positional parameters
+########################
+# NAME    :: script and function positional parameters
+# EXAMPLE :: my_script.sh arg1 arg2 ... argN
+# NOTES   :: Inside script or function these are referenced as arg1 => $1 to argN => $N (arg10 and above ${NN} referencing)
+
+
+# File descriptor redirection
+##############################
+# NAME    :: stderr redirection
+# EXAMPLE :: command_writing_error_message >&2
+# NOTES   :: Message written by command will be redirected to stderr instead of stdout
+
+
+# Parse option arguments 
+#########################
+# COMMAND :: getopts
+# SYNTAX  :: getopts <OPTSTRING> <variable>
+# EXAMPLE :: getopts ":l:h" opt
+# NOTES   :: If the first character of OPTSTRING is ':', getopts uses silent error reporting. (user handles errors)
+#         :: Otherwise getopts will print relevent error messages. Run "help getopts" for more details.
+
+
+# Parameter expansion substitution
+###################################
+# NAME    :: Bash parameter expansion replacement/substitution
+# EXAMPLE :: ${VAR:+SET}, ${VAR:-UNSET}, ${VAR##*/}
+# NOTES   :: ':+' => If VAR is set, replace it with "SET", otherwise empty, ':-' if VAR is unset, replace it with "UNSET" otherwise use the set value.
+#         :: '##*/' => deletes file path from VAR up to and including the last '/'.
+
+
+
+
+#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#@@ VERSION #3 CONCEPTS
+#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+# Change file permissions
+##########################
+# COMMAND :: chmod
+# SYNTAX  :: chmod [mode] <file>
+# EXAMPLE :: chmod +x passwdGen
+# NOTES   :: This command changes file permissions. Our example make the script executable for the owner, group, and others.
+
+
+
+
+# Bash Environmental Variable PATH
+###################################
+# NAME    :: PATH
+# EXAMPLE :: echo "$PATH" => /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+# NOTES   :: This environmental variable is the search path used by the OS when looking to execute a file.
+
+
+
+
+# Arrays
+#########
+# NAME    :: array
+# EXAMPLE :: array=( "dog" "cat" "food is good" )
+# NOTES   :: An array is a variable type that stores values in an N to 1 relationship as opposed to a normal variable
+#         :: which stores values in a 1 to 1 relationship.
+
+
+
+
+#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#@@ VERSION #4 CONCEPTS
+#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+# Bash help
+############
+# COMMAND :: help
+# SYNTAX  :: help [-m] <command>
+# EXAMPLE :: help -m declare
+# NOTES   :: The Bash 'help' command is similar to the system command 'man' except for looking up Bash help on builtins.
+#         :: Running Bash 'help' with the '-m' option prints the help message in a man page like format.
+
+
+
+
+# Builtin variables
+####################
+# NAME    :: Buitlin global variables
+# EXAMPLE :: FUNCNAME (inside of function, name of that function), HOSTNAME (system hostname), LINENO (line number when
+#         :: variable is expanded), RANDOM (random number from 0 - 32767) , REPLY (default READ variable)
+# NOTES   :: Other useful variables BASHPID, PPID, PROMPT_COMMAND, PWD, IFS, TMOUT, USER, LOGNAME, BASH_REMATCH,
+#         :: PATH (see above), PS1-4 (see below), & BASH_XTRACEFD (see below).
+
+
+
+
+# Bash PS prompts
+##################
+# NAME    :: PS1
+# EXAMPLE :: PS1='\u@\h:\$ '
+# NOTES   :: PS1 ==> Default interaction prompt
+
+# NAME    :: PS2
+# EXAMPLE :: PS2='> '
+# NOTES   :: PS2 ==> Continuation interactive prompt
+
+# NAME    :: PS3
+# EXAMPLE :: PS4='#? '
+# NOTES   :: PS3 ==> Bash 'select' prompt
+
+# NAME    :: PS4
+# EXAMPLE :: PS4='+ '
+# NOTES   :: PS4 ==> Prefix tracing output
+
+
+# Bash BASH_XTRACEFD
+#####################
+# NAME    :: BASH_XTRACEFD
+# EXAMPLE :: BASH_XTRACEFD="$FD_D"
+# NOTES   :: FD_D above is an integer that references a valid file descriptor. Used for debugging.
+
+
+# Bash exec
+############
+# COMMAND :: exec
+# SYNTAX  :: exec [<command> | {fd}> <file>]
+# EXAMPLE :: exec my_command OR exec {FD_D}> "$DebugFile"
+# NOTES   :: The first example replaces the current shell with the command 'my_command'.
+#         :: Then second command opens a file descriptor for writing to DebugFile, creates file descriptor FD_D (an integer),
+#         :: and allows for redirection to that file descriptor (echo "string" >&"$FD_D").
+
+
+
+
+# Concatenate command
+######################
+# COMMAND :: cat
+# SYNTAX  :: cat <file1> <file2> [... <fileN>] > <new_file>
+# EXAMPLE :: cat first_file second_file > first-second_file
+# NOTES   :: Concatenate files to stdout or redirection to file. Can also be used to print to stdout.
+
+
+
+
+# File link command
+####################
+# COMMAND :: ln
+# SYNTAX  :: ln -s <source_file> <shortcut_location>
+# EXAMPLE :: ln -s /home/bashed/passwdGen /home/bashed/complexPasswd
+# NOTES   :: Creates symbolic link between source_file and shortcut_location.

@@ -1,0 +1,391 @@
+#!/bin/bash
+# NO SET -x OR SET -v
+set +xv
+##########################
+# generate random passwd #
+# and print to stdout    #
+##########################
+#set -x
+PS4='+ $LINENO : '
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+export PATH
+
+
+
+
+# common script declarations
+declare -r ProgName="${0##*/}"
+declare -r Version="1.004"
+declare -r CreationDate="2022-02-25"
+declare -r VersionDate="2022-05-01"
+declare -r Author="BasheD"
+declare -r Description="Generate a random password"
+#declare -r DefaultScript="/home/bashed/passwdGen"
+declare -r DefaultScript="/home/bashed/video_dev_files/passwdGen/passwdGen_v4/passwdGen"
+declare -r Pid="$$"
+declare -r DebugFile="/tmp/${ProgName}.DEBUG"
+declare -i FD_D
+declare -ir DefLength=16
+declare -ir MinLength=8
+declare -ir MaxLength=32
+declare -ar AlphaChars=( "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z" )
+declare -ar NumericChars=( "0" "1" "2" "3" "4" "5" "6" "7" "8" "9" )
+declare -ar AlnumChars=( "${AlphaChars[@]}" "${NumericChars[@]}" )
+declare -ar ComplexChars=( "${AlnumChars[@]}" "!" "@" "#" "$" "%" "^" "&" "*" "-" "_" )
+
+
+
+
+# Functions ->
+
+# Usage: scriptUsage(exit_code)
+#
+#  @@Input:
+#    exit_code (optional)
+#    = integer
+#
+#  @@Output:
+#    print <stdout>
+#    = message string
+#
+#  @@Returns:
+#    none
+#
+#  @@Notes:
+#    always exits
+#
+#
+scriptUsage()
+{
+    cat<<ENDOFUSE
+
+      Usage: $ProgName [-l <password_length>] [-a|-n|-m|-c] [-L|-U|-M] [-d] [-h|-v]
+
+        $Description
+
+        Options:
+        --------
+        [Password Length]:
+        -l <password_length>      Must be an integer between $MinLength & $MaxLength (default: $DefLength)
+
+        [Character Set]:
+        -a                        Create an alphabetic only password
+        -n                        Create a numeric only password
+        -m                        Create an alphanumeric password
+        -c                        Create a complex password (default)
+
+        [Case Sensitivity]:
+        -L                        Create a password where all letters are lower case
+        -U                        Create a password where all letters are upper case
+        -M                        Create a password where all letters are mixed case (default)
+
+        [Help]:
+        -d                        Run the script in debug mode (data written to: $DebugFile)
+        -h                        Prints this help message
+        -v                        Print the version number
+
+      Written by: $Author
+      Created on: $CreationDate
+
+ENDOFUSE
+
+    exit "${1:-0}"
+}
+
+
+# Usage: linkUsage(exit_code)
+#
+#  @@Input:
+#    exit_code (optional)
+#    = integer
+#
+#  @@Output:
+#    print <stdout>
+#    = message string
+#
+#  @@Returns:
+#    none
+#
+#  @@Notes:
+#    always exits
+#
+#
+linkUsage()
+{
+    cat<<ENDOFUSE
+
+      Usage: $ProgName [-d]
+
+        Generate a random ${ProgName/Passwd/} password of $DefLength characters
+
+        Options:
+        --------
+        -d                        Run the script in debug mode (data written to: $DebugFile)
+
+      Written by: $Author
+      Created on: $CreationDate
+
+ENDOFUSE
+
+    exit "${1:-0}"
+}
+
+
+# Usage: printVersion()
+#
+#  @@Input:
+#    none
+#
+#  @@Output:
+#    print <stdout>
+#    = message string
+#
+#  @@Returns:
+#    none
+#
+#  @@Notes:
+#    always exits 0
+#
+#
+printVersion()
+{
+    cat<<ENDOFVERS
+
+    $ProgName -- v$Version
+
+    Written by:   $Author
+    Last updated: $VersionDate
+
+ENDOFVERS
+
+    exit 0
+}
+
+
+# Usage: getNumber()
+#
+#  @@Input:
+#    none
+#
+#  @@Output:
+#    print <stdout>
+#    = integer
+#
+#  @@Returns:
+#    none
+#
+#  @@Notes:
+#    none
+#
+#
+getNumber()
+{
+    shuf --input-range=0-$CHAR_RANGE --head-count=1
+}
+
+# Functions -|
+
+
+
+
+# CLI Arguments ->
+
+
+  case "$ProgName" in
+    "${DefaultScript##*/}")  # nothing to see here
+    ;;
+
+    *)  if [[ "$1" == "-h" ]]
+          then
+            linkUsage
+        elif (( "$#" > 1 )) || [[ -n "$1" && "$1" != "-d" ]]
+          then
+            echo "    ** Invalid argument [ $@ ]. For using advanced options call '${DefaultScript##*/} -h' **" >&2
+            linkUsage 1
+        else
+          case "$ProgName" in
+            "complexPasswd")  "$DefaultScript" "$1"
+                              exit "$?"
+                          ;;
+
+            "numericPasswd")  "$DefaultScript" -n "$1"
+                              exit "$?"
+                          ;;
+
+            "alphaPasswd"  )  "$DefaultScript" -a "$1"
+                              exit "$?"
+                          ;;
+          esac
+        fi
+    ;;
+  esac
+
+  # only used when DefaultScript is called
+  while getopts ":l:anmcLUMdhv" opt
+    do
+      case "$opt" in
+        l)  if (( $OPTARG >= $MinLength )) && (( $OPTARG <= $MaxLength ))
+              then
+                declare PASSWD_LENGTH="$OPTARG"
+              else
+                echo "    ** Invalid value for password length [ $OPTARG ] **" >&2
+                scriptUsage 1
+            fi
+        ;;
+
+        ## CHARACTER SET ##
+        a)  if [[ -z "${CharSet[@]}" ]]
+              then
+                CharSet=( "${AlphaChars[@]}" )
+              else
+                echo "    ** Cannot use more than one character set **" >&2
+                scriptUsage 1
+            fi
+        ;;
+
+        n)  if [[ -z "${CharSet[@]}" ]]
+              then
+                CharSet=( "${NumericChars[@]}" )
+              else
+                echo "    ** Cannot use more than one character set **" >&2
+                scriptUsage 1
+            fi
+        ;;
+
+        m)  if [[ -z "${CharSet[@]}" ]]
+              then
+                CharSet=( "${AlnumChars[@]}" )
+              else
+                echo "    ** Cannot use more than one character set **" >&2
+                scriptUsage 1
+            fi
+        ;;
+
+        c)  if [[ -z "${CharSet[@]}" ]]
+              then
+                CharSet=( "${ComplexChars[@]}" )
+              else
+                echo "    ** Cannot use more than one character set **" >&2
+                scriptUsage 1
+            fi
+        ;;
+
+        ## CASE SENSITIVITY ##
+        L)  if [[ -z "$SET_CASE" ]]
+              then
+                declare SET_CASE="lower"
+              else
+                echo "    ** Cannot use more than one case sensitivity **" >&2
+                scriptUsage 1
+            fi
+        ;;
+
+        U)  if [[ -z "$SET_CASE" ]]
+              then
+                declare SET_CASE="upper"
+              else
+                echo "    ** Cannot use more than one case sensitivity **" >&2
+                scriptUsage 1
+            fi
+        ;;
+
+        M)  if [[ -z "$SET_CASE" ]]
+              then
+                declare SET_CASE="mixed"
+              else
+                echo "    ** Cannot use more than one case sensitivity **" >&2
+                scriptUsage 1
+            fi
+        ;;
+
+        ## HELPERS ##
+        d)  exec {FD_D}> "$DebugFile"
+              BASH_XTRACEFD="$FD_D"
+              set -x
+        ;;
+
+        h)  scriptUsage
+        ;;
+
+        v)  printVersion
+        ;;
+
+       \?)  echo "    ** Invalid option [ $OPTARG ] **" >&2
+            scriptUsage 1
+        ;;
+
+        :)  echo "    ** Missing a required argument for $OPTARG **" >&2
+            scriptUsage 1
+        ;;
+      esac
+  done
+
+  # not required in this usage but a good practice to include anyways
+  shift $((OPTIND-1))
+
+  unset opt
+
+# CLI Arguments -|
+
+
+
+
+# Declarations ->
+
+  # set these to defaults if not already set
+  declare -ar CharSet=( "${CharSet[@]:-${ComplexChars[@]}}" )
+  declare PASSWD_LENGTH="${PASSWD_LENGTH:-$DefLength}"
+  declare SET_CASE="${SET_CASE:-mixed}"
+
+  # since the array is zero biased the length needs to be - 1
+  declare -i CHAR_RANGE="$(( ${#CharSet[@]} - 1 ))"
+
+  declare RAND_NUMBER
+  declare OUTPUT_PASSWD
+  declare NEW_LETTER
+
+  declare -i x=0
+
+# Declarations -|
+
+
+
+
+# Main() ->
+
+    # repeat until OUTPUT_PASSWD contains PASSWD_LENGTH characters
+    for (( x=0; x<"$PASSWD_LENGTH"; x++ ))
+      do
+        # generate a random number and store result in RAND_NUMBER
+        RAND_NUMBER=$(getNumber)
+
+        # convert RAND_NUMBER to letter and store letter in NEW_LETTER
+        NEW_LETTER="${CharSet[${RAND_NUMBER}]}"
+
+        # add random upper case letters
+        # shuf generates one number between 1 & 36 which is divided (modulus) by 2
+        # if the remainder is 0 then the number is even, so make the currently selected NEW_LETTER upper case
+        # has no effect on NEW_LETTER if NEW_LETTER is numeric
+        if (( $(( $(getNumber) % 2 )) == 0 ))
+          then
+            # add upper case NEW_LETTER to OUTPUT_PASSWD
+            OUTPUT_PASSWD="${OUTPUT_PASSWD}${NEW_LETTER^}"
+          else
+            # add NEW_LETTER to OUTPUT_PASSWD
+            OUTPUT_PASSWD="${OUTPUT_PASSWD}$NEW_LETTER"
+        fi
+    done
+
+    # handle case semsitivity if required (do nothing on mixed)
+    case "$SET_CASE" in
+      "lower")  OUTPUT_PASSWD="${OUTPUT_PASSWD,,}"
+            ;;
+
+      "upper")  OUTPUT_PASSWD="${OUTPUT_PASSWD^^}"
+            ;;
+    esac
+
+    # print final OUTPUT_PASSWD
+    echo "$OUTPUT_PASSWD"
+
+# Main() -|
